@@ -1,6 +1,6 @@
 ### Screenshot
 
-![Screenshot](http://raw.github.com/farseer90718/unite-character/master/screenshot.png)
+![Screenshot](https://raw.github.com/farseer90718/unite-character/master/screenshot.png)
 
 ### Approach
 
