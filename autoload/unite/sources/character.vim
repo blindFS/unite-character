@@ -24,9 +24,9 @@ endfunction
 
 function! s:unite_source.hooks.on_syntax(args, context)
     syntax match uniteSource__Character_html /&[^;]*;/ contained containedin=uniteSource__Character
-    syntax match uniteSource__Character_desc /[ a-zA-Z]*$/ contained containedin=uniteSource__Character contains=uniteCandidateInputKeyword
-    syntax match uniteSource__Character_char /"[^"]*"/ contained containedin=uniteSource__Character contains=uniteCandidateInputKeyword
-    syntax match uniteSource__Character_hex /0x[0-9A-F]*/ contained containedin=uniteSource__Character contains=uniteCandidateInputKeyword
+    syntax match uniteSource__Character_desc /".*$/ contained containedin=uniteSource__Character contains=uniteCandidateInputKeyword,uniteSource__Character_char
+    syntax match uniteSource__Character_char /"[^"]*"/ contained containedin=uniteSource__Character_desc
+    syntax match uniteSource__Character_hex /0x[0-9A-F]*/ contained containedin=uniteSource__Character
     highlight default link uniteSource__Character_html Constant
     highlight default link uniteSource__Character_desc Keyword
     highlight default link uniteSource__Character_char Define
