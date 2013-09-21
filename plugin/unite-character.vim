@@ -4,4 +4,4 @@ function! s:unicode_search(char)
     echo system(printf(s:command, a:char))
 endfunction
 
-command! SearchUnicode :call s:unicode_search(getline(".")[col(".") - 1])
+command! SearchUnicode :call s:unicode_search(matchstr(getline('.'), '.', col('.')-1))
