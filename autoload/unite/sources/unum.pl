@@ -147,29 +147,29 @@ the same terms as Perl itself.
     use warnings;
 
     sub usage {
-	print << "EOD";
+    print << "EOD";
 usage: unum arg...
     Arguments:
-	147               Decimal number
-	0371              Octal number
-	0xfa75            Hexadecimal number (letters may be A-F or a-f)
-	0b11010011        Binary number
-	'&#8747;&#x3c0;'  One or more XHTML numeric entities (hex or decimal)
-	xyz               The characters xyz (non-digit)
-	c=7Y              The characters 7Y (any Unicode characters)
-	b=cherokee        List Unicode blocks containing "CHEROKEE"
-	h=alpha           List XHTML entities containing "alpha"
-	n=aggravation     Unicode characters with "AGGRAVATION" in the name
-	n=^greek.*rho     Unicode characters beginning with "GREEK" and containing "RHO"
-	l=gothic          List all characters in matching Unicode blocks
+    147               Decimal number
+    0371              Octal number
+    0xfa75            Hexadecimal number (letters may be A-F or a-f)
+    0b11010011        Binary number
+    '&#8747;&#x3c0;'  One or more XHTML numeric entities (hex or decimal)
+    xyz               The characters xyz (non-digit)
+    c=7Y              The characters 7Y (any Unicode characters)
+    b=cherokee        List Unicode blocks containing "CHEROKEE"
+    h=alpha           List XHTML entities containing "alpha"
+    n=aggravation     Unicode characters with "AGGRAVATION" in the name
+    n=^greek.*rho     Unicode characters beginning with "GREEK" and containing "RHO"
+    l=gothic          List all characters in matching Unicode blocks
 
-	All name queries are case-insensitive and accept regular
-	expressions.  Be sure to quote regular expressions if they
-	contain characters with meaning to the shell.
-	
-	Run perldoc on this program or visit:
-	    http://www.fourmilab.ch/webtools/unum/
-	for additional information.
+    All name queries are case-insensitive and accept regular
+    expressions.  Be sure to quote regular expressions if they
+    contain characters with meaning to the shell.
+
+    Run perldoc on this program or visit:
+        http://www.fourmilab.ch/webtools/unum/
+    for additional information.
 EOD
     }
 
@@ -178,8 +178,8 @@ EOD
     binmode(STDOUT, ":utf8");
 
     if ($#ARGV < 0) {
-	usage();
-	exit(0);
+    usage();
+    exit(0);
     }
 
     init_names();
@@ -187,148 +187,148 @@ EOD
     my ($chartitle, $blocktitle) = (0, 0);
     my $arg = 0;
     while ($#ARGV >= 0) {
-	my $n = shift();
+    my $n = shift();
 
-	$arg++;
-	if ($n =~ m/^\d/) {
+    $arg++;
+    if ($n =~ m/^\d/) {
 
-	    #   Number                  List numeric and character representations
+        #   Number                  List numeric and character representations
 
-	    #   Argument is a number: use oct() to convert to binary
-	    $n = oct($n) if ($n =~ m/^0/);
+        #   Argument is a number: use oct() to convert to binary
+        $n = oct($n) if ($n =~ m/^0/);
 
-	} elsif ($n =~ m/^(b|l)=(.+)/) {
+    } elsif ($n =~ m/^(b|l)=(.+)/) {
 
-	    #   b=<block name>          List Unicode blocks matching name
+        #   b=<block name>          List Unicode blocks matching name
 
-	    my $bl = $1;
-	    my $cpat = qr/$2/i;
-	    my $listall = $bl =~ m/l/i;
+        my $bl = $1;
+        my $cpat = qr/$2/i;
+        my $listall = $bl =~ m/l/i;
 
-	    my $k;
-	    for $k (@UNICODE_BLOCKS) {
-		if ($k->[2] =~ m/$cpat/) {
-		    if (!$blocktitle) {
-			$chartitle = 0;
-			$blocktitle = 1;
-			print("   Start        End  Unicode Block\n");
-		    }
-		    printf("%8s - %8s  %s\n",
-			sprintf("U+%04X", $k->[0]),
-			sprintf("U+%04X", $k->[1]),
-			$k->[2]);
+        my $k;
+        for $k (@UNICODE_BLOCKS) {
+        if ($k->[2] =~ m/$cpat/) {
+            if (!$blocktitle) {
+            $chartitle = 0;
+            $blocktitle = 1;
+            print("   Start        End  Unicode Block\n");
+            }
+            printf("%8s - %8s  %s\n",
+            sprintf("U+%04X", $k->[0]),
+            sprintf("U+%04X", $k->[1]),
+            $k->[2]);
 
-		    if ($listall) {
-			for (my $i = $k->[0]; $i <= $k->[1]; $i++) {
-			    showchar($i);
-			}
-		    }
-		}
-	    }
-	    next;
+            if ($listall) {
+            for (my $i = $k->[0]; $i <= $k->[1]; $i++) {
+                showchar($i);
+            }
+            }
+        }
+        }
+        next;
 
-	} elsif ($n =~ m/^h=(.+)/) {
+    } elsif ($n =~ m/^h=(.+)/) {
 
-	    #   h=<character name>      List XHTML character entities matching name
+        #   h=<character name>      List XHTML character entities matching name
 
-	    my $cpat = qr/$1/i;
+        my $cpat = qr/$1/i;
 
-	    my $k;
-	    for $k (sort {$a <=> $b} keys(%XHTML_ENTITIES)) {
-		if ($XHTML_ENTITIES{$k} =~ m/$cpat/) {
-		    showchar($k);
-		}
-	    }
-	    next;
+        my $k;
+        for $k (sort {$a <=> $b} keys(%XHTML_ENTITIES)) {
+        if ($XHTML_ENTITIES{$k} =~ m/$cpat/) {
+            showchar($k);
+        }
+        }
+        next;
 
-	} elsif ($n =~ m/^n=(.+)/) {
+    } elsif ($n =~ m/^n=(.+)/) {
 
-	    #   n=<character name>      List Unicode characters matching name
+        #   n=<character name>      List Unicode characters matching name
 
-	    my $cpat = qr/$1/i;
+        my $cpat = qr/$1/i;
 
-	    #   The following would be faster if we selected matching
-	    #   characters into an auxiliary array and then sorted
-	    #   the selected ones before printing.  In fact, the time it
-	    #   takes to sort the entire list is less than that consumed
-	    #   in init_names() loading it, so there's little point bothering
-	    #   with this refinement.
-	    my $k;
-	    for $k (sort {oct("0x$a") <=> oct("0x$b")} keys(%UNICODE_NAMES)) {
-		if ($UNICODE_NAMES{$k} =~ m/$cpat/) {
-		    showchar(oct("0x$k"));
-		}
-	    }
-	    next;
+        #   The following would be faster if we selected matching
+        #   characters into an auxiliary array and then sorted
+        #   the selected ones before printing.  In fact, the time it
+        #   takes to sort the entire list is less than that consumed
+        #   in init_names() loading it, so there's little point bothering
+        #   with this refinement.
+        my $k;
+        for $k (sort {oct("0x$a") <=> oct("0x$b")} keys(%UNICODE_NAMES)) {
+        if ($UNICODE_NAMES{$k} =~ m/$cpat/) {
+            showchar(oct("0x$k"));
+        }
+        }
+        next;
 
-	} elsif ($n =~ m/^&#/) {
+    } elsif ($n =~ m/^&#/) {
 
-	    #   '&#NNN;&#xNNNN;...'     One or more XHTML numeric entities
+        #   '&#NNN;&#xNNNN;...'     One or more XHTML numeric entities
 
-	    my @htmlent;
-	    while ($n =~ s/&#(x?[0-9A-Fa-f]+);//) {
-		my $hch = $1;
-		$hch =~ s/^x/0x/;
-		push(@htmlent, $hch);
-	    }
-	    unshift(@ARGV, @htmlent);
-	    next;
+        my @htmlent;
+        while ($n =~ s/&#(x?[0-9A-Fa-f]+);//) {
+        my $hch = $1;
+        $hch =~ s/^x/0x/;
+        push(@htmlent, $hch);
+        }
+        unshift(@ARGV, @htmlent);
+        next;
 
-	} else {
+    } else {
 
-	    #   =<char>... or c=<char>...   List code for one or more characters
+        #   =<char>... or c=<char>...   List code for one or more characters
 
-	    #   If argument is an equal sign followed by a single
-	    #   character, take the second character as the argument.
-	    #   This allows treating digits as characters to be looked
-	    #   up.
-	    $n =~ s/^c?=(.+)$/$1/i;
+        #   If argument is an equal sign followed by a single
+        #   character, take the second character as the argument.
+        #   This allows treating digits as characters to be looked
+        #   up.
+        $n =~ s/^c?=(.+)$/$1/i;
 
-	    while ($n =~ s/^(.)//) {
-		showchar(ord($1));
-	    }
-	    next;
-	}
+        while ($n =~ s/^(.)//) {
+        showchar(ord($1));
+        }
+        next;
+    }
 
-	showchar($n);
+    showchar($n);
     }
 
     #   Show a numeric code in all its manifestations
 
     sub showchar {
-	my ($n) = @_;
+    my ($n) = @_;
 
 
-	my $ch = ((($n >= 32) && ($n < 128)) || ($n > 160)) ?
-	    chr($n) :
-	    sprintf("\\x{%X}", $n);
+    my $ch = ((($n >= 32) && ($n < 128)) || ($n > 160)) ?
+        chr($n) :
+        sprintf("\\x{%X}", $n);
 
-	#   Determine the Unicode character code as best we can
+    #   Determine the Unicode character code as best we can
 
-	my $u = uname($n);
-	if (!defined($u)) {
-	    $u = ublock($n);
-	    if (defined($u)) {
-		$u = sprintf("%s U+%05X", $u, $n);
-	    } else {
-		$u = sprintf("Undefined U+%05X", $n);
-	    }
-	}
+    my $u = uname($n);
+    if (!defined($u)) {
+        $u = ublock($n);
+        if (defined($u)) {
+        $u = sprintf("%s U+%05X", $u, $n);
+        } else {
+        $u = sprintf("Undefined U+%05X", $n);
+        }
+    }
 
-	if (!$chartitle) {
-	    $blocktitle = 0;
-	    $chartitle = 1;
-	    print("   Octal  Decimal      Hex        HTML    Character   Unicode\n");
-	}
+    if (!$chartitle) {
+        $blocktitle = 0;
+        $chartitle = 1;
+        print("   Octal  Decimal      Hex        HTML    Character   Unicode\n");
+    }
 
-	printf("%8s %8d %8s %11s    %-8s    %s\n",
-	    sprintf("0%lo", $n),
-	    $n,
-	    sprintf("0x%X", $n),
-	    defined($XHTML_ENTITIES{$n}) ? "&$XHTML_ENTITIES{$n};"
-					: sprintf("&#%d;", $n),
-	    sprintf("\"%s\"", $ch),
-	    $u);
+    printf("%8s %8d %8s %11s    %-8s    %s\n",
+        sprintf("0%lo", $n),
+        $n,
+        sprintf("0x%X", $n),
+        defined($XHTML_ENTITIES{$n}) ? "&$XHTML_ENTITIES{$n};"
+                    : sprintf("&#%d;", $n),
+        sprintf("\"%s\"", $ch),
+        $u);
     }
 
 =pod
@@ -359,535 +359,535 @@ the Ctrl-letter code which generates them.
 =cut
 
     sub uname {
-	my $code = shift;
-	if ($code >= 0x4E00) {
-	    if ($code <= 0x9FFF || ($code >= 0xF900 && $code <= 0xFAFF)) {
-		# CJK Ideographs
-		return sprintf "CJK UNIFIED IDEOGRAPH %04X", $code;
-	    } elsif ($code >= 0xD800 && $code <= 0xF8FF) {
-		# Surrogate and private
-		if ($code <= 0xDFFF) {
-		    return "<surrogate>";
-		} else {
-		    return "<private>";
-		}
-	    } elsif ($code >= 0xAC00 && $code <= 0xD7A3) {
-		# Hangul Syllables
-		my $sindex = $code - 0xAC00;
-		my $l = 0x1100 + int($sindex / (21*28));
-		my $v = 0x1161 + int(($sindex % (21*28)) / 28);
-		my $t = 0x11A7 + $sindex % 28;
-		my @s = ($l, $v, $t);
-		pop(@s) if $t == 0x11A7;
-		@s = map {
-		    $_ = sprintf("%04X", $_);
-		    $JAMO_SHORT_NAME{$_} || " U+$_ ";
-		} @s;
-		return join("", "HANGUL SYLLABLE ", @s)
-	    }
-	}
-	$UNICODE_NAMES{sprintf("%04X",$code)}
+    my $code = shift;
+    if ($code >= 0x4E00) {
+        if ($code <= 0x9FFF || ($code >= 0xF900 && $code <= 0xFAFF)) {
+        # CJK Ideographs
+        return sprintf "CJK UNIFIED IDEOGRAPH %04X", $code;
+        } elsif ($code >= 0xD800 && $code <= 0xF8FF) {
+        # Surrogate and private
+        if ($code <= 0xDFFF) {
+            return "<surrogate>";
+        } else {
+            return "<private>";
+        }
+        } elsif ($code >= 0xAC00 && $code <= 0xD7A3) {
+        # Hangul Syllables
+        my $sindex = $code - 0xAC00;
+        my $l = 0x1100 + int($sindex / (21*28));
+        my $v = 0x1161 + int(($sindex % (21*28)) / 28);
+        my $t = 0x11A7 + $sindex % 28;
+        my @s = ($l, $v, $t);
+        pop(@s) if $t == 0x11A7;
+        @s = map {
+            $_ = sprintf("%04X", $_);
+            $JAMO_SHORT_NAME{$_} || " U+$_ ";
+        } @s;
+        return join("", "HANGUL SYLLABLE ", @s)
+        }
+    }
+    $UNICODE_NAMES{sprintf("%04X",$code)}
     }
 
     sub ublock {
-	my $code = shift;
-	# XXX: could use a binary search, but I am too lazy today...
-	my $block;
-	for $block (@UNICODE_BLOCKS) {
-	    return $block->[2] if $block->[0] <= $code && $block->[1] >= $code;
-	}
-	undef;
+    my $code = shift;
+    # XXX: could use a binary search, but I am too lazy today...
+    my $block;
+    for $block (@UNICODE_BLOCKS) {
+        return $block->[2] if $block->[0] <= $code && $block->[1] >= $code;
+    }
+    undef;
     }
 
     sub init_names {
-	keys %UNICODE_NAMES = 16351;  # preextent
-	keys %XHTML_ENTITIES = 253;
+    keys %UNICODE_NAMES = 16351;  # preextent
+    keys %XHTML_ENTITIES = 253;
 
-	while (<DATA>) {
-	    chop;
-	    my($code, $name) = split(' ', $_, 2);
-	    $UNICODE_NAMES{$code} = $name;
-	}
-	close(DATA);
+    while (<DATA>) {
+        chop;
+        my($code, $name) = split(' ', $_, 2);
+        $UNICODE_NAMES{$code} = $name;
+    }
+    close(DATA);
 
-	#   XHTML 1.0 Entity Definitions
-	%XHTML_ENTITIES = (
-	    #   From http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent
-	    160 => 'nbsp',
-	    161 => 'iexcl',
-	    162 => 'cent',
-	    163 => 'pound',
-	    164 => 'curren',
-	    165 => 'yen',
-	    166 => 'brvbar',
-	    167 => 'sect',
-	    168 => 'uml',
-	    169 => 'copy',
-	    170 => 'ordf',
-	    171 => 'laquo',
-	    172 => 'not',
-	    173 => 'shy',
-	    174 => 'reg',
-	    175 => 'macr',
-	    176 => 'deg',
-	    177 => 'plusmn',
-	    178 => 'sup2',
-	    179 => 'sup3',
-	    180 => 'acute',
-	    181 => 'micro',
-	    182 => 'para',
-	    183 => 'middot',
-	    184 => 'cedil',
-	    185 => 'sup1',
-	    186 => 'ordm',
-	    187 => 'raquo',
-	    188 => 'frac14',
-	    189 => 'frac12',
-	    190 => 'frac34',
-	    191 => 'iquest',
-	    192 => 'Agrave',
-	    193 => 'Aacute',
-	    194 => 'Acirc',
-	    195 => 'Atilde',
-	    196 => 'Auml',
-	    197 => 'Aring',
-	    198 => 'AElig',
-	    199 => 'Ccedil',
-	    200 => 'Egrave',
-	    201 => 'Eacute',
-	    202 => 'Ecirc',
-	    203 => 'Euml',
-	    204 => 'Igrave',
-	    205 => 'Iacute',
-	    206 => 'Icirc',
-	    207 => 'Iuml',
-	    208 => 'ETH',
-	    209 => 'Ntilde',
-	    210 => 'Ograve',
-	    211 => 'Oacute',
-	    212 => 'Ocirc',
-	    213 => 'Otilde',
-	    214 => 'Ouml',
-	    215 => 'times',
-	    216 => 'Oslash',
-	    217 => 'Ugrave',
-	    218 => 'Uacute',
-	    219 => 'Ucirc',
-	    220 => 'Uuml',
-	    221 => 'Yacute',
-	    222 => 'THORN',
-	    223 => 'szlig',
-	    224 => 'agrave',
-	    225 => 'aacute',
-	    226 => 'acirc',
-	    227 => 'atilde',
-	    228 => 'auml',
-	    229 => 'aring',
-	    230 => 'aelig',
-	    231 => 'ccedil',
-	    232 => 'egrave',
-	    233 => 'eacute',
-	    234 => 'ecirc',
-	    235 => 'euml',
-	    236 => 'igrave',
-	    237 => 'iacute',
-	    238 => 'icirc',
-	    239 => 'iuml',
-	    240 => 'eth',
-	    241 => 'ntilde',
-	    242 => 'ograve',
-	    243 => 'oacute',
-	    244 => 'ocirc',
-	    245 => 'otilde',
-	    246 => 'ouml',
-	    247 => 'divide',
-	    248 => 'oslash',
-	    249 => 'ugrave',
-	    250 => 'uacute',
-	    251 => 'ucirc',
-	    252 => 'uuml',
-	    253 => 'yacute',
-	    254 => 'thorn',
-	    255 => 'yuml',
-	    #   From http://www.w3.org/TR/xhtml1/DTD/xhtml-special.ent
-	    34 => 'quot',
-	    38 => 'amp',
-	    60 => 'lt',
-	    62 => 'gt',
-	    39 => 'apos',
-	    338 => 'OElig',
-	    339 => 'oelig',
-	    352 => 'Scaron',
-	    353 => 'scaron',
-	    376 => 'Yuml',
-	    710 => 'circ',
-	    732 => 'tilde',
-	    8194 => 'ensp',
-	    8195 => 'emsp',
-	    8201 => 'thinsp',
-	    8204 => 'zwnj',
-	    8205 => 'zwj',
-	    8206 => 'lrm',
-	    8207 => 'rlm',
-	    8211 => 'ndash',
-	    8212 => 'mdash',
-	    8216 => 'lsquo',
-	    8217 => 'rsquo',
-	    8218 => 'sbquo',
-	    8220 => 'ldquo',
-	    8221 => 'rdquo',
-	    8222 => 'bdquo',
-	    8224 => 'dagger',
-	    8225 => 'Dagger',
-	    8240 => 'permil',
-	    8249 => 'lsaquo',
-	    8250 => 'rsaquo',
-	    8364 => 'euro',
-	    #   From http://www.w3.org/TR/xhtml1/DTD/xhtml-symbol.ent
-	    402 => 'fnof',
-	    913 => 'Alpha',
-	    914 => 'Beta',
-	    915 => 'Gamma',
-	    916 => 'Delta',
-	    917 => 'Epsilon',
-	    918 => 'Zeta',
-	    919 => 'Eta',
-	    920 => 'Theta',
-	    921 => 'Iota',
-	    922 => 'Kappa',
-	    923 => 'Lambda',
-	    924 => 'Mu',
-	    925 => 'Nu',
-	    926 => 'Xi',
-	    927 => 'Omicron',
-	    928 => 'Pi',
-	    929 => 'Rho',
-	    931 => 'Sigma',
-	    932 => 'Tau',
-	    933 => 'Upsilon',
-	    934 => 'Phi',
-	    935 => 'Chi',
-	    936 => 'Psi',
-	    937 => 'Omega',
-	    945 => 'alpha',
-	    946 => 'beta',
-	    947 => 'gamma',
-	    948 => 'delta',
-	    949 => 'epsilon',
-	    950 => 'zeta',
-	    951 => 'eta',
-	    952 => 'theta',
-	    953 => 'iota',
-	    954 => 'kappa',
-	    955 => 'lambda',
-	    956 => 'mu',
-	    957 => 'nu',
-	    958 => 'xi',
-	    959 => 'omicron',
-	    960 => 'pi',
-	    961 => 'rho',
-	    962 => 'sigmaf',
-	    963 => 'sigma',
-	    964 => 'tau',
-	    965 => 'upsilon',
-	    966 => 'phi',
-	    967 => 'chi',
-	    968 => 'psi',
-	    969 => 'omega',
-	    977 => 'thetasym',
-	    978 => 'upsih',
-	    982 => 'piv',
-	    8226 => 'bull',
-	    8230 => 'hellip',
-	    8242 => 'prime',
-	    8243 => 'Prime',
-	    8254 => 'oline',
-	    8260 => 'frasl',
-	    8472 => 'weierp',
-	    8465 => 'image',
-	    8476 => 'real',
-	    8482 => 'trade',
-	    8501 => 'alefsym',
-	    8592 => 'larr',
-	    8593 => 'uarr',
-	    8594 => 'rarr',
-	    8595 => 'darr',
-	    8596 => 'harr',
-	    8629 => 'crarr',
-	    8656 => 'lArr',
-	    8657 => 'uArr',
-	    8658 => 'rArr',
-	    8659 => 'dArr',
-	    8660 => 'hArr',
-	    8704 => 'forall',
-	    8706 => 'part',
-	    8707 => 'exist',
-	    8709 => 'empty',
-	    8711 => 'nabla',
-	    8712 => 'isin',
-	    8713 => 'notin',
-	    8715 => 'ni',
-	    8719 => 'prod',
-	    8721 => 'sum',
-	    8722 => 'minus',
-	    8727 => 'lowast',
-	    8730 => 'radic',
-	    8733 => 'prop',
-	    8734 => 'infin',
-	    8736 => 'ang',
-	    8743 => 'and',
-	    8744 => 'or',
-	    8745 => 'cap',
-	    8746 => 'cup',
-	    8747 => 'int',
-	    8756 => 'there4',
-	    8764 => 'sim',
-	    8773 => 'cong',
-	    8776 => 'asymp',
-	    8800 => 'ne',
-	    8801 => 'equiv',
-	    8804 => 'le',
-	    8805 => 'ge',
-	    8834 => 'sub',
-	    8835 => 'sup',
-	    8836 => 'nsub',
-	    8838 => 'sube',
-	    8839 => 'supe',
-	    8853 => 'oplus',
-	    8855 => 'otimes',
-	    8869 => 'perp',
-	    8901 => 'sdot',
-	    8968 => 'lceil',
-	    8969 => 'rceil',
-	    8970 => 'lfloor',
-	    8971 => 'rfloor',
-	    9001 => 'lang',
-	    9002 => 'rang',
-	    9674 => 'loz',
-	    9824 => 'spades',
-	    9827 => 'clubs',
-	    9829 => 'hearts',
-	    9830 => 'diams'
-	);
+    #   XHTML 1.0 Entity Definitions
+    %XHTML_ENTITIES = (
+        #   From http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent
+        160 => 'nbsp',
+        161 => 'iexcl',
+        162 => 'cent',
+        163 => 'pound',
+        164 => 'curren',
+        165 => 'yen',
+        166 => 'brvbar',
+        167 => 'sect',
+        168 => 'uml',
+        169 => 'copy',
+        170 => 'ordf',
+        171 => 'laquo',
+        172 => 'not',
+        173 => 'shy',
+        174 => 'reg',
+        175 => 'macr',
+        176 => 'deg',
+        177 => 'plusmn',
+        178 => 'sup2',
+        179 => 'sup3',
+        180 => 'acute',
+        181 => 'micro',
+        182 => 'para',
+        183 => 'middot',
+        184 => 'cedil',
+        185 => 'sup1',
+        186 => 'ordm',
+        187 => 'raquo',
+        188 => 'frac14',
+        189 => 'frac12',
+        190 => 'frac34',
+        191 => 'iquest',
+        192 => 'Agrave',
+        193 => 'Aacute',
+        194 => 'Acirc',
+        195 => 'Atilde',
+        196 => 'Auml',
+        197 => 'Aring',
+        198 => 'AElig',
+        199 => 'Ccedil',
+        200 => 'Egrave',
+        201 => 'Eacute',
+        202 => 'Ecirc',
+        203 => 'Euml',
+        204 => 'Igrave',
+        205 => 'Iacute',
+        206 => 'Icirc',
+        207 => 'Iuml',
+        208 => 'ETH',
+        209 => 'Ntilde',
+        210 => 'Ograve',
+        211 => 'Oacute',
+        212 => 'Ocirc',
+        213 => 'Otilde',
+        214 => 'Ouml',
+        215 => 'times',
+        216 => 'Oslash',
+        217 => 'Ugrave',
+        218 => 'Uacute',
+        219 => 'Ucirc',
+        220 => 'Uuml',
+        221 => 'Yacute',
+        222 => 'THORN',
+        223 => 'szlig',
+        224 => 'agrave',
+        225 => 'aacute',
+        226 => 'acirc',
+        227 => 'atilde',
+        228 => 'auml',
+        229 => 'aring',
+        230 => 'aelig',
+        231 => 'ccedil',
+        232 => 'egrave',
+        233 => 'eacute',
+        234 => 'ecirc',
+        235 => 'euml',
+        236 => 'igrave',
+        237 => 'iacute',
+        238 => 'icirc',
+        239 => 'iuml',
+        240 => 'eth',
+        241 => 'ntilde',
+        242 => 'ograve',
+        243 => 'oacute',
+        244 => 'ocirc',
+        245 => 'otilde',
+        246 => 'ouml',
+        247 => 'divide',
+        248 => 'oslash',
+        249 => 'ugrave',
+        250 => 'uacute',
+        251 => 'ucirc',
+        252 => 'uuml',
+        253 => 'yacute',
+        254 => 'thorn',
+        255 => 'yuml',
+        #   From http://www.w3.org/TR/xhtml1/DTD/xhtml-special.ent
+        34 => 'quot',
+        38 => 'amp',
+        60 => 'lt',
+        62 => 'gt',
+        39 => 'apos',
+        338 => 'OElig',
+        339 => 'oelig',
+        352 => 'Scaron',
+        353 => 'scaron',
+        376 => 'Yuml',
+        710 => 'circ',
+        732 => 'tilde',
+        8194 => 'ensp',
+        8195 => 'emsp',
+        8201 => 'thinsp',
+        8204 => 'zwnj',
+        8205 => 'zwj',
+        8206 => 'lrm',
+        8207 => 'rlm',
+        8211 => 'ndash',
+        8212 => 'mdash',
+        8216 => 'lsquo',
+        8217 => 'rsquo',
+        8218 => 'sbquo',
+        8220 => 'ldquo',
+        8221 => 'rdquo',
+        8222 => 'bdquo',
+        8224 => 'dagger',
+        8225 => 'Dagger',
+        8240 => 'permil',
+        8249 => 'lsaquo',
+        8250 => 'rsaquo',
+        8364 => 'euro',
+        #   From http://www.w3.org/TR/xhtml1/DTD/xhtml-symbol.ent
+        402 => 'fnof',
+        913 => 'Alpha',
+        914 => 'Beta',
+        915 => 'Gamma',
+        916 => 'Delta',
+        917 => 'Epsilon',
+        918 => 'Zeta',
+        919 => 'Eta',
+        920 => 'Theta',
+        921 => 'Iota',
+        922 => 'Kappa',
+        923 => 'Lambda',
+        924 => 'Mu',
+        925 => 'Nu',
+        926 => 'Xi',
+        927 => 'Omicron',
+        928 => 'Pi',
+        929 => 'Rho',
+        931 => 'Sigma',
+        932 => 'Tau',
+        933 => 'Upsilon',
+        934 => 'Phi',
+        935 => 'Chi',
+        936 => 'Psi',
+        937 => 'Omega',
+        945 => 'alpha',
+        946 => 'beta',
+        947 => 'gamma',
+        948 => 'delta',
+        949 => 'epsilon',
+        950 => 'zeta',
+        951 => 'eta',
+        952 => 'theta',
+        953 => 'iota',
+        954 => 'kappa',
+        955 => 'lambda',
+        956 => 'mu',
+        957 => 'nu',
+        958 => 'xi',
+        959 => 'omicron',
+        960 => 'pi',
+        961 => 'rho',
+        962 => 'sigmaf',
+        963 => 'sigma',
+        964 => 'tau',
+        965 => 'upsilon',
+        966 => 'phi',
+        967 => 'chi',
+        968 => 'psi',
+        969 => 'omega',
+        977 => 'thetasym',
+        978 => 'upsih',
+        982 => 'piv',
+        8226 => 'bull',
+        8230 => 'hellip',
+        8242 => 'prime',
+        8243 => 'Prime',
+        8254 => 'oline',
+        8260 => 'frasl',
+        8472 => 'weierp',
+        8465 => 'image',
+        8476 => 'real',
+        8482 => 'trade',
+        8501 => 'alefsym',
+        8592 => 'larr',
+        8593 => 'uarr',
+        8594 => 'rarr',
+        8595 => 'darr',
+        8596 => 'harr',
+        8629 => 'crarr',
+        8656 => 'lArr',
+        8657 => 'uArr',
+        8658 => 'rArr',
+        8659 => 'dArr',
+        8660 => 'hArr',
+        8704 => 'forall',
+        8706 => 'part',
+        8707 => 'exist',
+        8709 => 'empty',
+        8711 => 'nabla',
+        8712 => 'isin',
+        8713 => 'notin',
+        8715 => 'ni',
+        8719 => 'prod',
+        8721 => 'sum',
+        8722 => 'minus',
+        8727 => 'lowast',
+        8730 => 'radic',
+        8733 => 'prop',
+        8734 => 'infin',
+        8736 => 'ang',
+        8743 => 'and',
+        8744 => 'or',
+        8745 => 'cap',
+        8746 => 'cup',
+        8747 => 'int',
+        8756 => 'there4',
+        8764 => 'sim',
+        8773 => 'cong',
+        8776 => 'asymp',
+        8800 => 'ne',
+        8801 => 'equiv',
+        8804 => 'le',
+        8805 => 'ge',
+        8834 => 'sub',
+        8835 => 'sup',
+        8836 => 'nsub',
+        8838 => 'sube',
+        8839 => 'supe',
+        8853 => 'oplus',
+        8855 => 'otimes',
+        8869 => 'perp',
+        8901 => 'sdot',
+        8968 => 'lceil',
+        8969 => 'rceil',
+        8970 => 'lfloor',
+        8971 => 'rfloor',
+        9001 => 'lang',
+        9002 => 'rang',
+        9674 => 'loz',
+        9824 => 'spades',
+        9827 => 'clubs',
+        9829 => 'hearts',
+        9830 => 'diams'
+    );
 
-	@UNICODE_BLOCKS = (
-	#  start   end        block name
-	  [0x0000, 0x007F => 'Basic Latin'],
-	  [0x0080, 0x00FF => 'Latin-1 Supplement'],
-	  [0x0100, 0x017F => 'Latin Extended-A'],
-	  [0x0180, 0x024F => 'Latin Extended-B'],
-	  [0x0250, 0x02AF => 'IPA Extensions'],
-	  [0x02B0, 0x02FF => 'Spacing Modifier Letters'],
-	  [0x0300, 0x036F => 'Combining Diacritical Marks'],
-	  [0x0370, 0x03FF => 'Greek and Coptic'],
-	  [0x0400, 0x04FF => 'Cyrillic'],
-	  [0x0500, 0x052F => 'Cyrillic Supplement'],
-	  [0x0530, 0x058F => 'Armenian'],
-	  [0x0590, 0x05FF => 'Hebrew'],
-	  [0x0600, 0x06FF => 'Arabic'],
-	  [0x0700, 0x074F => 'Syriac'],
-	  [0x0750, 0x077F => 'Arabic Supplement'],
-	  [0x0780, 0x07BF => 'Thaana'],
-	  [0x0900, 0x097F => 'Devanagari'],
-	  [0x0980, 0x09FF => 'Bengali'],
-	  [0x0A00, 0x0A7F => 'Gurmukhi'],
-	  [0x0A80, 0x0AFF => 'Gujarati'],
-	  [0x0B00, 0x0B7F => 'Oriya'],
-	  [0x0B80, 0x0BFF => 'Tamil'],
-	  [0x0C00, 0x0C7F => 'Telugu'],
-	  [0x0C80, 0x0CFF => 'Kannada'],
-	  [0x0D00, 0x0D7F => 'Malayalam'],
-	  [0x0D80, 0x0DFF => 'Sinhala'],
-	  [0x0E00, 0x0E7F => 'Thai'],
-	  [0x0E80, 0x0EFF => 'Lao'],
-	  [0x0F00, 0x0FFF => 'Tibetan'],
-	  [0x1000, 0x109F => 'Myanmar'],
-	  [0x10A0, 0x10FF => 'Georgian'],
-	  [0x1100, 0x11FF => 'Hangul Jamo'],
-	  [0x1200, 0x137F => 'Ethiopic'],
-	  [0x1380, 0x139F => 'Ethiopic Supplement'],
-	  [0x13A0, 0x13FF => 'Cherokee'],
-	  [0x1400, 0x167F => 'Unified Canadian Aboriginal Syllabics'],
-	  [0x1680, 0x169F => 'Ogham'],
-	  [0x16A0, 0x16FF => 'Runic'],
-	  [0x1700, 0x171F => 'Tagalog'],
-	  [0x1720, 0x173F => 'Hanunoo'],
-	  [0x1740, 0x175F => 'Buhid'],
-	  [0x1760, 0x177F => 'Tagbanwa'],
-	  [0x1780, 0x17FF => 'Khmer'],
-	  [0x1800, 0x18AF => 'Mongolian'],
-	  [0x1900, 0x194F => 'Limbu'],
-	  [0x1950, 0x197F => 'Tai Le'],
-	  [0x1980, 0x19DF => 'New Tai Lue'],
-	  [0x19E0, 0x19FF => 'Khmer Symbols'],
-	  [0x1A00, 0x1A1F => 'Buginese'],
-	  [0x1D00, 0x1D7F => 'Phonetic Extensions'],
-	  [0x1D80, 0x1DBF => 'Phonetic Extensions Supplement'],
-	  [0x1DC0, 0x1DFF => 'Combining Diacritical Marks Supplement'],
-	  [0x1E00, 0x1EFF => 'Latin Extended Additional'],
-	  [0x1F00, 0x1FFF => 'Greek Extended'],
-	  [0x2000, 0x206F => 'General Punctuation'],
-	  [0x2070, 0x209F => 'Superscripts and Subscripts'],
-	  [0x20A0, 0x20CF => 'Currency Symbols'],
-	  [0x20D0, 0x20FF => 'Combining Diacritical Marks for Symbols'],
-	  [0x2100, 0x214F => 'Letterlike Symbols'],
-	  [0x2150, 0x218F => 'Number Forms'],
-	  [0x2190, 0x21FF => 'Arrows'],
-	  [0x2200, 0x22FF => 'Mathematical Operators'],
-	  [0x2300, 0x23FF => 'Miscellaneous Technical'],
-	  [0x2400, 0x243F => 'Control Pictures'],
-	  [0x2440, 0x245F => 'Optical Character Recognition'],
-	  [0x2460, 0x24FF => 'Enclosed Alphanumerics'],
-	  [0x2500, 0x257F => 'Box Drawing'],
-	  [0x2580, 0x259F => 'Block Elements'],
-	  [0x25A0, 0x25FF => 'Geometric Shapes'],
-	  [0x2600, 0x26FF => 'Miscellaneous Symbols'],
-	  [0x2700, 0x27BF => 'Dingbats'],
-	  [0x27C0, 0x27EF => 'Miscellaneous Mathematical Symbols-A'],
-	  [0x27F0, 0x27FF => 'Supplemental Arrows-A'],
-	  [0x2800, 0x28FF => 'Braille Patterns'],
-	  [0x2900, 0x297F => 'Supplemental Arrows-B'],
-	  [0x2980, 0x29FF => 'Miscellaneous Mathematical Symbols-B'],
-	  [0x2A00, 0x2AFF => 'Supplemental Mathematical Operators'],
-	  [0x2B00, 0x2BFF => 'Miscellaneous Symbols and Arrows'],
-	  [0x2C00, 0x2C5F => 'Glagolitic'],
-	  [0x2C80, 0x2CFF => 'Coptic'],
-	  [0x2D00, 0x2D2F => 'Georgian Supplement'],
-	  [0x2D30, 0x2D7F => 'Tifinagh'],
-	  [0x2D80, 0x2DDF => 'Ethiopic Extended'],
-	  [0x2E00, 0x2E7F => 'Supplemental Punctuation'],
-	  [0x2E80, 0x2EFF => 'CJK Radicals Supplement'],
-	  [0x2F00, 0x2FDF => 'Kangxi Radicals'],
-	  [0x2FF0, 0x2FFF => 'Ideographic Description Characters'],
-	  [0x3000, 0x303F => 'CJK Symbols and Punctuation'],
-	  [0x3040, 0x309F => 'Hiragana'],
-	  [0x30A0, 0x30FF => 'Katakana'],
-	  [0x3100, 0x312F => 'Bopomofo'],
-	  [0x3130, 0x318F => 'Hangul Compatibility Jamo'],
-	  [0x3190, 0x319F => 'Kanbun'],
-	  [0x31A0, 0x31BF => 'Bopomofo Extended'],
-	  [0x31C0, 0x31EF => 'CJK Strokes'],
-	  [0x31F0, 0x31FF => 'Katakana Phonetic Extensions'],
-	  [0x3200, 0x32FF => 'Enclosed CJK Letters and Months'],
-	  [0x3300, 0x33FF => 'CJK Compatibility'],
-	  [0x3400, 0x4DBF => 'CJK Unified Ideographs Extension A'],
-	  [0x4DC0, 0x4DFF => 'Yijing Hexagram Symbols'],
-	  [0x4E00, 0x9FFF => 'CJK Unified Ideographs'],
-	  [0xA000, 0xA48F => 'Yi Syllables'],
-	  [0xA490, 0xA4CF => 'Yi Radicals'],
-	  [0xA700, 0xA71F => 'Modifier Tone Letters'],
-	  [0xA800, 0xA82F => 'Syloti Nagri'],
-	  [0xAC00, 0xD7AF => 'Hangul Syllables'],
-	  [0xD800, 0xDB7F => 'High Surrogates'],
-	  [0xDB80, 0xDBFF => 'High Private Use Surrogates'],
-	  [0xDC00, 0xDFFF => 'Low Surrogates'],
-	  [0xE000, 0xF8FF => 'Private Use Area'],
-	  [0xF900, 0xFAFF => 'CJK Compatibility Ideographs'],
-	  [0xFB00, 0xFB4F => 'Alphabetic Presentation Forms'],
-	  [0xFB50, 0xFDFF => 'Arabic Presentation Forms-A'],
-	  [0xFE00, 0xFE0F => 'Variation Selectors'],
-	  [0xFE10, 0xFE1F => 'Vertical Forms'],
-	  [0xFE20, 0xFE2F => 'Combining Half Marks'],
-	  [0xFE30, 0xFE4F => 'CJK Compatibility Forms'],
-	  [0xFE50, 0xFE6F => 'Small Form Variants'],
-	  [0xFE70, 0xFEFF => 'Arabic Presentation Forms-B'],
-	  [0xFF00, 0xFFEF => 'Halfwidth and Fullwidth Forms'],
-	  [0xFFF0, 0xFFFF => 'Specials'],
-	  [0x10000, 0x1007F => 'Linear B Syllabary'],
-	  [0x10080, 0x100FF => 'Linear B Ideograms'],
-	  [0x10100, 0x1013F => 'Aegean Numbers'],
-	  [0x10140, 0x1018F => 'Ancient Greek Numbers'],
-	  [0x10300, 0x1032F => 'Old Italic'],
-	  [0x10330, 0x1034F => 'Gothic'],
-	  [0x10380, 0x1039F => 'Ugaritic'],
-	  [0x103A0, 0x103DF => 'Old Persian'],
-	  [0x10400, 0x1044F => 'Deseret'],
-	  [0x10450, 0x1047F => 'Shavian'],
-	  [0x10480, 0x104AF => 'Osmanya'],
-	  [0x10800, 0x1083F => 'Cypriot Syllabary'],
-	  [0x10A00, 0x10A5F => 'Kharoshthi'],
-	  [0x1D000, 0x1D0FF => 'Byzantine Musical Symbols'],
-	  [0x1D100, 0x1D1FF => 'Musical Symbols'],
-	  [0x1D200, 0x1D24F => 'Ancient Greek Musical Notation'],
-	  [0x1D300, 0x1D35F => 'Tai Xuan Jing Symbols'],
-	  [0x1D400, 0x1D7FF => 'Mathematical Alphanumeric Symbols'],
-	  [0x20000, 0x2A6DF => 'CJK Unified Ideographs Extension B'],
-	  [0x2F800, 0x2FA1F => 'CJK Compatibility Ideographs Supplement'],
-	  [0xE0000, 0xE007F => 'Tags'],
-	  [0xE0100, 0xE01EF => 'Variation Selectors Supplement'],
-	  [0xF0000, 0xFFFFF => 'Supplementary Private Use Area-A'],
-	  [0x100000, 0x10FFFF => 'Supplementary Private Use Area-B'],
-	);
+    @UNICODE_BLOCKS = (
+    #  start   end        block name
+      [0x0000, 0x007F => 'Basic Latin'],
+      [0x0080, 0x00FF => 'Latin-1 Supplement'],
+      [0x0100, 0x017F => 'Latin Extended-A'],
+      [0x0180, 0x024F => 'Latin Extended-B'],
+      [0x0250, 0x02AF => 'IPA Extensions'],
+      [0x02B0, 0x02FF => 'Spacing Modifier Letters'],
+      [0x0300, 0x036F => 'Combining Diacritical Marks'],
+      [0x0370, 0x03FF => 'Greek and Coptic'],
+      [0x0400, 0x04FF => 'Cyrillic'],
+      [0x0500, 0x052F => 'Cyrillic Supplement'],
+      [0x0530, 0x058F => 'Armenian'],
+      [0x0590, 0x05FF => 'Hebrew'],
+      [0x0600, 0x06FF => 'Arabic'],
+      [0x0700, 0x074F => 'Syriac'],
+      [0x0750, 0x077F => 'Arabic Supplement'],
+      [0x0780, 0x07BF => 'Thaana'],
+      [0x0900, 0x097F => 'Devanagari'],
+      [0x0980, 0x09FF => 'Bengali'],
+      [0x0A00, 0x0A7F => 'Gurmukhi'],
+      [0x0A80, 0x0AFF => 'Gujarati'],
+      [0x0B00, 0x0B7F => 'Oriya'],
+      [0x0B80, 0x0BFF => 'Tamil'],
+      [0x0C00, 0x0C7F => 'Telugu'],
+      [0x0C80, 0x0CFF => 'Kannada'],
+      [0x0D00, 0x0D7F => 'Malayalam'],
+      [0x0D80, 0x0DFF => 'Sinhala'],
+      [0x0E00, 0x0E7F => 'Thai'],
+      [0x0E80, 0x0EFF => 'Lao'],
+      [0x0F00, 0x0FFF => 'Tibetan'],
+      [0x1000, 0x109F => 'Myanmar'],
+      [0x10A0, 0x10FF => 'Georgian'],
+      [0x1100, 0x11FF => 'Hangul Jamo'],
+      [0x1200, 0x137F => 'Ethiopic'],
+      [0x1380, 0x139F => 'Ethiopic Supplement'],
+      [0x13A0, 0x13FF => 'Cherokee'],
+      [0x1400, 0x167F => 'Unified Canadian Aboriginal Syllabics'],
+      [0x1680, 0x169F => 'Ogham'],
+      [0x16A0, 0x16FF => 'Runic'],
+      [0x1700, 0x171F => 'Tagalog'],
+      [0x1720, 0x173F => 'Hanunoo'],
+      [0x1740, 0x175F => 'Buhid'],
+      [0x1760, 0x177F => 'Tagbanwa'],
+      [0x1780, 0x17FF => 'Khmer'],
+      [0x1800, 0x18AF => 'Mongolian'],
+      [0x1900, 0x194F => 'Limbu'],
+      [0x1950, 0x197F => 'Tai Le'],
+      [0x1980, 0x19DF => 'New Tai Lue'],
+      [0x19E0, 0x19FF => 'Khmer Symbols'],
+      [0x1A00, 0x1A1F => 'Buginese'],
+      [0x1D00, 0x1D7F => 'Phonetic Extensions'],
+      [0x1D80, 0x1DBF => 'Phonetic Extensions Supplement'],
+      [0x1DC0, 0x1DFF => 'Combining Diacritical Marks Supplement'],
+      [0x1E00, 0x1EFF => 'Latin Extended Additional'],
+      [0x1F00, 0x1FFF => 'Greek Extended'],
+      [0x2000, 0x206F => 'General Punctuation'],
+      [0x2070, 0x209F => 'Superscripts and Subscripts'],
+      [0x20A0, 0x20CF => 'Currency Symbols'],
+      [0x20D0, 0x20FF => 'Combining Diacritical Marks for Symbols'],
+      [0x2100, 0x214F => 'Letterlike Symbols'],
+      [0x2150, 0x218F => 'Number Forms'],
+      [0x2190, 0x21FF => 'Arrows'],
+      [0x2200, 0x22FF => 'Mathematical Operators'],
+      [0x2300, 0x23FF => 'Miscellaneous Technical'],
+      [0x2400, 0x243F => 'Control Pictures'],
+      [0x2440, 0x245F => 'Optical Character Recognition'],
+      [0x2460, 0x24FF => 'Enclosed Alphanumerics'],
+      [0x2500, 0x257F => 'Box Drawing'],
+      [0x2580, 0x259F => 'Block Elements'],
+      [0x25A0, 0x25FF => 'Geometric Shapes'],
+      [0x2600, 0x26FF => 'Miscellaneous Symbols'],
+      [0x2700, 0x27BF => 'Dingbats'],
+      [0x27C0, 0x27EF => 'Miscellaneous Mathematical Symbols-A'],
+      [0x27F0, 0x27FF => 'Supplemental Arrows-A'],
+      [0x2800, 0x28FF => 'Braille Patterns'],
+      [0x2900, 0x297F => 'Supplemental Arrows-B'],
+      [0x2980, 0x29FF => 'Miscellaneous Mathematical Symbols-B'],
+      [0x2A00, 0x2AFF => 'Supplemental Mathematical Operators'],
+      [0x2B00, 0x2BFF => 'Miscellaneous Symbols and Arrows'],
+      [0x2C00, 0x2C5F => 'Glagolitic'],
+      [0x2C80, 0x2CFF => 'Coptic'],
+      [0x2D00, 0x2D2F => 'Georgian Supplement'],
+      [0x2D30, 0x2D7F => 'Tifinagh'],
+      [0x2D80, 0x2DDF => 'Ethiopic Extended'],
+      [0x2E00, 0x2E7F => 'Supplemental Punctuation'],
+      [0x2E80, 0x2EFF => 'CJK Radicals Supplement'],
+      [0x2F00, 0x2FDF => 'Kangxi Radicals'],
+      [0x2FF0, 0x2FFF => 'Ideographic Description Characters'],
+      [0x3000, 0x303F => 'CJK Symbols and Punctuation'],
+      [0x3040, 0x309F => 'Hiragana'],
+      [0x30A0, 0x30FF => 'Katakana'],
+      [0x3100, 0x312F => 'Bopomofo'],
+      [0x3130, 0x318F => 'Hangul Compatibility Jamo'],
+      [0x3190, 0x319F => 'Kanbun'],
+      [0x31A0, 0x31BF => 'Bopomofo Extended'],
+      [0x31C0, 0x31EF => 'CJK Strokes'],
+      [0x31F0, 0x31FF => 'Katakana Phonetic Extensions'],
+      [0x3200, 0x32FF => 'Enclosed CJK Letters and Months'],
+      [0x3300, 0x33FF => 'CJK Compatibility'],
+      [0x3400, 0x4DBF => 'CJK Unified Ideographs Extension A'],
+      [0x4DC0, 0x4DFF => 'Yijing Hexagram Symbols'],
+      [0x4E00, 0x9FFF => 'CJK Unified Ideographs'],
+      [0xA000, 0xA48F => 'Yi Syllables'],
+      [0xA490, 0xA4CF => 'Yi Radicals'],
+      [0xA700, 0xA71F => 'Modifier Tone Letters'],
+      [0xA800, 0xA82F => 'Syloti Nagri'],
+      [0xAC00, 0xD7AF => 'Hangul Syllables'],
+      [0xD800, 0xDB7F => 'High Surrogates'],
+      [0xDB80, 0xDBFF => 'High Private Use Surrogates'],
+      [0xDC00, 0xDFFF => 'Low Surrogates'],
+      [0xE000, 0xF8FF => 'Private Use Area'],
+      [0xF900, 0xFAFF => 'CJK Compatibility Ideographs'],
+      [0xFB00, 0xFB4F => 'Alphabetic Presentation Forms'],
+      [0xFB50, 0xFDFF => 'Arabic Presentation Forms-A'],
+      [0xFE00, 0xFE0F => 'Variation Selectors'],
+      [0xFE10, 0xFE1F => 'Vertical Forms'],
+      [0xFE20, 0xFE2F => 'Combining Half Marks'],
+      [0xFE30, 0xFE4F => 'CJK Compatibility Forms'],
+      [0xFE50, 0xFE6F => 'Small Form Variants'],
+      [0xFE70, 0xFEFF => 'Arabic Presentation Forms-B'],
+      [0xFF00, 0xFFEF => 'Halfwidth and Fullwidth Forms'],
+      [0xFFF0, 0xFFFF => 'Specials'],
+      [0x10000, 0x1007F => 'Linear B Syllabary'],
+      [0x10080, 0x100FF => 'Linear B Ideograms'],
+      [0x10100, 0x1013F => 'Aegean Numbers'],
+      [0x10140, 0x1018F => 'Ancient Greek Numbers'],
+      [0x10300, 0x1032F => 'Old Italic'],
+      [0x10330, 0x1034F => 'Gothic'],
+      [0x10380, 0x1039F => 'Ugaritic'],
+      [0x103A0, 0x103DF => 'Old Persian'],
+      [0x10400, 0x1044F => 'Deseret'],
+      [0x10450, 0x1047F => 'Shavian'],
+      [0x10480, 0x104AF => 'Osmanya'],
+      [0x10800, 0x1083F => 'Cypriot Syllabary'],
+      [0x10A00, 0x10A5F => 'Kharoshthi'],
+      [0x1D000, 0x1D0FF => 'Byzantine Musical Symbols'],
+      [0x1D100, 0x1D1FF => 'Musical Symbols'],
+      [0x1D200, 0x1D24F => 'Ancient Greek Musical Notation'],
+      [0x1D300, 0x1D35F => 'Tai Xuan Jing Symbols'],
+      [0x1D400, 0x1D7FF => 'Mathematical Alphanumeric Symbols'],
+      [0x20000, 0x2A6DF => 'CJK Unified Ideographs Extension B'],
+      [0x2F800, 0x2FA1F => 'CJK Compatibility Ideographs Supplement'],
+      [0xE0000, 0xE007F => 'Tags'],
+      [0xE0100, 0xE01EF => 'Variation Selectors Supplement'],
+      [0xF0000, 0xFFFFF => 'Supplementary Private Use Area-A'],
+      [0x100000, 0x10FFFF => 'Supplementary Private Use Area-B'],
+    );
 
-	%JAMO_SHORT_NAME = (
-	    '1100' => 'G',
-	    '1101' => 'GG',
-	    '1102' => 'N',
-	    '1103' => 'D',
-	    '1104' => 'DD',
-	    '1105' => 'L',
-	    '1106' => 'M',
-	    '1107' => 'B',
-	    '1108' => 'BB',
-	    '1109' => 'S',
-	    '110A' => 'SS',
-	    '110B' => '',
-	    '110C' => 'J',
-	    '110D' => 'JJ',
-	    '110E' => 'C',
-	    '110F' => 'K',
-	    '1110' => 'T',
-	    '1111' => 'P',
-	    '1112' => 'H',
-	    '1161' => 'A',
-	    '1162' => 'AE',
-	    '1163' => 'YA',
-	    '1164' => 'YAE',
-	    '1165' => 'EO',
-	    '1166' => 'E',
-	    '1167' => 'YEO',
-	    '1168' => 'YE',
-	    '1169' => 'O',
-	    '116A' => 'WA',
-	    '116B' => 'WAE',
-	    '116C' => 'OE',
-	    '116D' => 'YO',
-	    '116E' => 'U',
-	    '116F' => 'WEO',
-	    '1170' => 'WE',
-	    '1171' => 'WI',
-	    '1172' => 'YU',
-	    '1173' => 'EU',
-	    '1174' => 'YI',
-	    '1175' => 'I',
-	    '11A8' => 'G',
-	    '11A9' => 'GG',
-	    '11AA' => 'GS',
-	    '11AB' => 'N',
-	    '11AC' => 'NJ',
-	    '11AD' => 'NH',
-	    '11AE' => 'D',
-	    '11AF' => 'L',
-	    '11B0' => 'LG',
-	    '11B1' => 'LM',
-	    '11B2' => 'LB',
-	    '11B3' => 'LS',
-	    '11B4' => 'LT',
-	    '11B5' => 'LP',
-	    '11B6' => 'LH',
-	    '11B7' => 'M',
-	    '11B8' => 'B',
-	    '11B9' => 'BS',
-	    '11BA' => 'S',
-	    '11BB' => 'SS',
-	    '11BC' => 'NG',
-	    '11BD' => 'J',
-	    '11BE' => 'C',
-	    '11BF' => 'K',
-	    '11C0' => 'T',
-	    '11C1' => 'P',
-	    '11C2' => 'H',
-	);
+    %JAMO_SHORT_NAME = (
+        '1100' => 'G',
+        '1101' => 'GG',
+        '1102' => 'N',
+        '1103' => 'D',
+        '1104' => 'DD',
+        '1105' => 'L',
+        '1106' => 'M',
+        '1107' => 'B',
+        '1108' => 'BB',
+        '1109' => 'S',
+        '110A' => 'SS',
+        '110B' => '',
+        '110C' => 'J',
+        '110D' => 'JJ',
+        '110E' => 'C',
+        '110F' => 'K',
+        '1110' => 'T',
+        '1111' => 'P',
+        '1112' => 'H',
+        '1161' => 'A',
+        '1162' => 'AE',
+        '1163' => 'YA',
+        '1164' => 'YAE',
+        '1165' => 'EO',
+        '1166' => 'E',
+        '1167' => 'YEO',
+        '1168' => 'YE',
+        '1169' => 'O',
+        '116A' => 'WA',
+        '116B' => 'WAE',
+        '116C' => 'OE',
+        '116D' => 'YO',
+        '116E' => 'U',
+        '116F' => 'WEO',
+        '1170' => 'WE',
+        '1171' => 'WI',
+        '1172' => 'YU',
+        '1173' => 'EU',
+        '1174' => 'YI',
+        '1175' => 'I',
+        '11A8' => 'G',
+        '11A9' => 'GG',
+        '11AA' => 'GS',
+        '11AB' => 'N',
+        '11AC' => 'NJ',
+        '11AD' => 'NH',
+        '11AE' => 'D',
+        '11AF' => 'L',
+        '11B0' => 'LG',
+        '11B1' => 'LM',
+        '11B2' => 'LB',
+        '11B3' => 'LS',
+        '11B4' => 'LT',
+        '11B5' => 'LP',
+        '11B6' => 'LH',
+        '11B7' => 'M',
+        '11B8' => 'B',
+        '11B9' => 'BS',
+        '11BA' => 'S',
+        '11BB' => 'SS',
+        '11BC' => 'NG',
+        '11BD' => 'J',
+        '11BE' => 'C',
+        '11BF' => 'K',
+        '11C0' => 'T',
+        '11C1' => 'P',
+        '11C2' => 'H',
+    );
     }
 
 __DATA__

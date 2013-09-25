@@ -6,6 +6,7 @@ let s:unite_source = {
             \ 'required_pattern_length': 2,
             \ 'is_volatile': 1,
             \ 'hooks' : {},
+            \ 'filters' : ['matcher_regexp'],
             \ 'action_table': {},
             \ 'syntax' : 'uniteSource__Character'
             \ }
