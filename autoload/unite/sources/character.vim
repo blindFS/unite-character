@@ -18,9 +18,19 @@ let s:unite_source.action_table.insert= {
             \ 'is_quit' : 1,
             \ }
 
+let s:unite_source.action_table.yank= {
+            \ 'description' : 'yank the character',
+            \ 'is_quit' : 1,
+            \ }
+
 function! s:unite_source.action_table.insert.func(candidate)
     let @" = matchstr(a:candidate.word, '"\zs.*\ze"')
     normal p
+endfunction
+
+function! s:unite_source.action_table.yank.func(candidate)
+    let @" = matchstr(a:candidate.word, '"\zs.*\ze"')
+    let @+ = matchstr(a:candidate.word, '"\zs.*\ze"')
 endfunction
 
 function! s:unite_source.hooks.on_syntax(args, context)
