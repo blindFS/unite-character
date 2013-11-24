@@ -5,10 +5,8 @@ function! s:unicode_search(char)
 endfunction
 
 function! s:unicode_html(char)
-    normal x
-    let @" = split(system(printf(s:command, a:char)), '\s\+')[9]
-    let g:ll = split(system(printf(s:command, a:char)), '\s\+')
-    normal P
+    let html = split(system(printf(s:command, a:char)), '\s\+')[9]
+    silent execute "normal! s\<C-R>=html\<ESC>"
 endfunction
 
 command! SearchUnicode :call s:unicode_search(matchstr(getline('.'), '.', col('.')-1))
