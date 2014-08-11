@@ -4,6 +4,7 @@ set cpo&vim
 let s:unite_source = {
             \ 'name': 'character',
             \ 'required_pattern_length': 2,
+            \ 'max_candidates': 30,
             \ 'is_volatile': 1,
             \ 'hooks' : {},
             \ 'filters' : ['matcher_regexp'],
