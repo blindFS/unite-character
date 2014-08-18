@@ -1,7 +1,7 @@
 let s:command = expand('<sfile>:p:h').'/../autoload/unite/sources/unum.pl c="%s"'
 
 function! s:unicode_search(char)
-    echo system(printf(s:command, a:char))
+    echo system(printf(s:command, escape(a:char, '"\')))
 endfunction
 
 function! s:unicode_html(char)
